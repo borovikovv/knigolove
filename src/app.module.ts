@@ -9,15 +9,14 @@ import { Book } from './books/book.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-    type: 'sqlite',
-    database: 'db.sqlite',
-    entities: [User, Book ],
-    synchronize: true,
-  }),
-  ConfigModule.forRoot(),
+      type: 'sqlite',
+      database: 'db.sqlite',
+      entities: [User, Book],
+      synchronize: true,
+    }),
+    ConfigModule.forRoot(),
     BooksModule,
-    UsersModule
+    UsersModule,
   ],
 })
-
 export class AppModule {}
