@@ -9,7 +9,6 @@ import {
   Query,
   NotFoundException,
   Session,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -17,13 +16,11 @@ import { UserDto } from './dtos/user.dto';
 import { UsersService } from './users.service';
 import { AuthService } from './auth.service';
 import { Serialize } from 'src/interceptops';
-import { CurrectUserInterceptor } from './interceptors/currect-user.interceptor';
 import { CurrectUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 
 @Controller('auth')
 @Serialize(UserDto)
-@UseInterceptors(CurrectUserInterceptor)
 export class UsersController {
   constructor(
     private userService: UsersService,
