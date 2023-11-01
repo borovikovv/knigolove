@@ -14,7 +14,10 @@ import { Book } from './books/book.entity';
       entities: [User, Book],
       synchronize: true,
     }),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     BooksModule,
     UsersModule,
   ],
