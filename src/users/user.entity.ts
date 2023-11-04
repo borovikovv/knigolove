@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Book } from 'src/books/book.entity';
 
 @Entity()
 export class User {
@@ -11,18 +12,18 @@ export class User {
   @Column()
   password: string;
 
-  // @Column()
-  // first_name: string;
+  @Column()
+  first_name: string;
 
-  // @Column()
-  // last_name: string;
+  @Column()
+  last_name: string;
 
-  // @Column()
-  // role: number;
+  @Column()
+  role: number;
 
-  // @Column()
-  // preferences: string;
+  @Column()
+  status: number;
 
-  // @Column()
-  // status: number;
+  @Column()
+  reviews: Book[];
 }
