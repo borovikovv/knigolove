@@ -19,7 +19,7 @@ export class Book {
   description: string;
 
   @Column()
-  year: string;
+  year: number;
 
   @Column()
   publisher: string;
@@ -30,6 +30,7 @@ export class Book {
   @Column()
   rating: number;
 
-  @Column()
+  @ManyToMany(() => User, (user) => user.reviews)
+  @JoinTable()
   reviewers: User[];
 }

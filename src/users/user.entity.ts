@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Book } from 'src/books/book.entity';
 
 @Entity()
@@ -24,6 +30,7 @@ export class User {
   @Column()
   status: number;
 
-  @Column()
+  @ManyToMany(() => Book, (book) => book.reviewers)
+  @JoinTable()
   reviews: Book[];
 }
