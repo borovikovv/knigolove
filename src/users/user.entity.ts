@@ -4,8 +4,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Book } from 'src/books/book.entity';
+import { PublicFile } from 'src/files/files.entity';
 
 @Entity()
 export class User {
@@ -27,10 +30,14 @@ export class User {
   @Column()
   role: number;
 
-  @Column()
-  status: number;
+  @JoinColumn()
+  @OneToOne(() => PublicFile, {
+    eager: true,
+    nullable: true,
+  })
+  public avatar?: PublicFile;
 
   @ManyToMany(() => Book, (book) => book.reviewers)
   @JoinTable()
-  reviews: Book[];
+  reviews?: Book[];
 }

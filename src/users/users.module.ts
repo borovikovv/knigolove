@@ -6,9 +6,10 @@ import { AuthService } from './auth.service';
 import { User } from './user.entity';
 import { CurrectUserInterceptor } from './interceptors/currect-user.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { FilesModule } from 'src/files/files.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), FilesModule],
   providers: [
     UsersService,
     AuthService,

@@ -23,6 +23,6 @@ export class FilesController {
     )
     file: Express.Multer.File,
   ) {
-    await this.filesServise.upload(file.originalname, file.buffer);
+    await this.filesServise.uploadPublicFiles(file.originalname, file.buffer);
   }
 }

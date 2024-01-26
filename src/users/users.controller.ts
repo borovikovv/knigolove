@@ -9,6 +9,8 @@ import {
   Query,
   NotFoundException,
   Session,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -18,8 +20,10 @@ import { AuthService } from './auth.service';
 import { Serialize } from 'src/interceptops';
 import { CurrectUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SignInUserDto } from './dtos/sign-in.dto';
 
-@Controller('auth')
+@Controller('user')
 @Serialize(UserDto)
 export class UsersController {
   constructor(
@@ -29,10 +33,16 @@ export class UsersController {
 
   @Post('/signup')
   async createUser(
-    @Body() { email, password }: CreateUserDto,
+    @Body() { email, password, first_name, last_name, role }: CreateUserDto,
     @Session() session: any,
   ) {
-    const user = await this.authService.signup(email, password);
+    const user = await this.authService.signup(
+      email,
+      password,
+      first_name,
+      last_name,
+      role,
+    );
     session.userId = user.id;
 
     return user;
@@ -40,7 +50,7 @@ export class UsersController {
 
   @Post('/signin')
   async signin(
-    @Body() { email, password }: CreateUserDto,
+    @Body() { email, password }: SignInUserDto,
     @Session() session: any,
   ) {
     const user = await this.authService.signin(email, password);
@@ -60,12 +70,11 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findUser(@Param('id') id: string) {
-    const user = this.userService.findOne(parseInt(id));
+  async findUser(@Param('id') id: string) {
+    const user = await this.userService.findOne(parseInt(id));
     if (!user) {
       throw new NotFoundException('not found user');
     }
-
     return user;
   }
 
@@ -82,5 +91,18 @@ export class UsersController {
   @Patch('/:id')
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.userService.update(parseInt(id), body);
+  }
+
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async addAvatar(
+    @Session() session: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userService.addAvatar(
+      session.userId,
+      file.buffer,
+      file.originalname,
+    );
   }
 }

@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import { Book } from './books/book.entity';
 import { FilesModule } from './files/files.module';
+import { PublicFile } from './files/files.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { FilesModule } from './files/files.module';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [User, Book],
+      entities: [User, Book, PublicFile],
       synchronize: true,
     }),
     ConfigModule.forRoot({
