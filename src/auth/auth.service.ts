@@ -3,9 +3,10 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UsersService } from '../users/users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
+import { SignUpUserDto } from './dtos/signup.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -13,13 +14,8 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
   constructor(private usersService: UsersService) {}
 
-  async signup(
-    email: string,
-    password: string,
-    first_name: string,
-    last_name: string,
-    role: number,
-  ) {
+  async signup(userData: SignUpUserDto) {
+    const { email, password, first_name, last_name, role } = userData;
     const users = await this.usersService.find(email);
     if (users.length) {
       throw new BadRequestException('This email already use');
