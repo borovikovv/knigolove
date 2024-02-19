@@ -1,7 +1,17 @@
-import { Controller, Post, Body, Get, Session } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Session,
+  HttpCode,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { Serialize } from 'src/interceptops';
-import { SignInUserDto } from './dtos/signin.dto';
+import { RequestWithUser, SignInUserDto } from './dtos/signin.dto';
 import { UserDto } from 'src/users/dtos/user.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { CurrectUser } from 'src/users/decorators/current-user.decorator';
@@ -29,12 +39,17 @@ export class AuthController {
     return user;
   }
 
+  @HttpCode(200)
   @Post('/signin')
   async signin(
     @Body() { email, password }: SignInUserDto,
     @Session() session: any,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
   ) {
     const user = await this.authService.signin(email, password);
+    const cookie = this.authService.getCookieWithJwtToken(user.id);
+    response.setHeader('Set-Cookie', cookie);
     session.userId = user.id;
 
     return user;
