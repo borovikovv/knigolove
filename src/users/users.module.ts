@@ -7,9 +7,10 @@ import { User } from './user.entity';
 import { CurrectUserInterceptor } from './interceptors/currect-user.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { FilesModule } from 'src/files/files.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), FilesModule],
+  imports: [TypeOrmModule.forFeature([User]), FilesModule, JwtModule],
   providers: [
     UsersService,
     AuthService,

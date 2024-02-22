@@ -3,10 +3,10 @@ import {
   Post,
   Body,
   Get,
-  Session,
   HttpCode,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
@@ -16,16 +16,16 @@ import { UserDto } from 'src/users/dtos/user.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { CurrectUser } from 'src/users/decorators/current-user.decorator';
 import { User } from 'src/users/user.entity';
+import { LocalAuthGuard } from 'src/guards/auth.guard';
 
-@Controller('user')
+@Controller('auth')
 @Serialize(UserDto)
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/signup')
-  async createUser(
+  async signup(
     @Body() { email, password, first_name, last_name, role }: CreateUserDto,
-    @Session() session: any,
   ) {
     const user = await this.authService.signup({
       email,
@@ -34,7 +34,6 @@ export class AuthController {
       last_name,
       role,
     });
-    session.userId = user.id;
 
     return user;
   }
@@ -43,14 +42,13 @@ export class AuthController {
   @Post('/signin')
   async signin(
     @Body() { email, password }: SignInUserDto,
-    @Session() session: any,
     @Req() request: RequestWithUser,
     @Res() response: Response,
   ) {
     const user = await this.authService.signin(email, password);
     const cookie = this.authService.getCookieWithJwtToken(user.id);
     response.setHeader('Set-Cookie', cookie);
-    session.userId = user.id;
+    response.send(user);
 
     return user;
   }
@@ -60,8 +58,10 @@ export class AuthController {
     return user;
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('/signout')
-  signOut(@Session() session: any) {
-    session.userId = null;
+  async signOut(@Req() request: RequestWithUser, @Res() response: Response) {
+    response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+    return response.sendStatus(200);
   }
 }

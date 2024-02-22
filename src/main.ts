@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieSession = require('cookie-session');
 import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { config } from 'aws-sdk';
 
@@ -16,6 +17,7 @@ async function bootstrap() {
       keys: [configService.get('COOKIE_SECRET')],
     }),
   );
+  app.use(cookieParser());
   config.update({
     accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
     secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),

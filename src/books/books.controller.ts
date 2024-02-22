@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dtos/create-book.dto';
-import { LocalAuthenticationGuard } from '../guards/auth.guard';
+import { LocalAuthGuard } from '../guards/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('books')
@@ -17,7 +17,7 @@ export class BooksController {
 
   @Post('/create')
   @UseInterceptors(FileInterceptor('image'))
-  @UseGuards(LocalAuthenticationGuard)
+  @UseGuards(LocalAuthGuard)
   createBook(
     @Body() body: CreateBookDto,
     @UploadedFile() file: Express.Multer.File,
