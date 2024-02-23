@@ -10,6 +10,7 @@ import { User } from './users/user.entity';
 import { Book } from './books/book.entity';
 import { FilesModule } from './files/files.module';
 import { PublicFile } from './files/files.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PublicFile } from './files/files.entity';
     BooksModule,
     UsersModule,
     FilesModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
