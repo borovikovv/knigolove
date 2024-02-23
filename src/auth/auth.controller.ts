@@ -14,9 +14,8 @@ import { Serialize } from 'src/interceptops';
 import { RequestWithUser, SignInUserDto } from './dtos/signin.dto';
 import { UserDto } from 'src/users/dtos/user.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
-import { CurrectUser } from 'src/users/decorators/current-user.decorator';
-import { User } from 'src/users/user.entity';
 import { LocalAuthGuard } from 'src/guards/auth.guard';
+import JwtAuthGuard from 'src/guards/jwt.guards';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -49,12 +48,13 @@ export class AuthController {
     const cookie = this.authService.getCookieWithJwtToken(user.id);
     response.setHeader('Set-Cookie', cookie);
     response.send(user);
-
     return user;
   }
 
-  @Get('who')
-  async whoIAm(@CurrectUser() user: User) {
+  @UseGuards(JwtAuthGuard)
+  @Get('/who')
+  async whoIAm(@Req() request: RequestWithUser) {
+    const user = request.user;
     return user;
   }
 
