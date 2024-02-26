@@ -46,7 +46,7 @@ export class AuthController {
   ) {
     const user = await this.authService.signin(email, password);
     const cookie = this.authService.getCookieWithJwtToken(user.id);
-    response.setHeader('Set-Cookie', cookie);
+    response.cookie('Set-Cookie', cookie);
     response.send(user);
     return user;
   }

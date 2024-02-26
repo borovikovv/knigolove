@@ -16,6 +16,10 @@ async function bootstrap() {
     secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
     region: configService.get('AWS_REGION'),
   });
+  app.enableCors({
+    credentials: true,
+    origin: configService.get('CLIENT_ORIGIN'),
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
