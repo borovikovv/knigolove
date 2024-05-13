@@ -21,7 +21,7 @@ export class UsersService {
     password: string,
     first_name: string,
     last_name: string,
-    role: number,
+    role: string,
   ) {
     const user = this.repo.create({
       email,

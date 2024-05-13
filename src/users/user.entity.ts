@@ -28,7 +28,7 @@ export class User {
   last_name: string;
 
   @Column()
-  role: number;
+  role: string;
 
   @JoinColumn()
   @OneToOne(() => PublicFile, {

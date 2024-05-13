@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dtos/create-book.dto';
-import { LocalAuthGuard } from '../guards/auth.guard';
+import { LocalAuthGuard } from '../guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('books')

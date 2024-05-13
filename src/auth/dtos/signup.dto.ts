@@ -14,5 +14,5 @@ export class SignUpUserDto {
   last_name: string;
 
   @IsNumber()
-  role: number;
+  role: string;
 }

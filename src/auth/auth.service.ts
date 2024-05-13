@@ -2,14 +2,16 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
+
 import { UsersService } from '../users/users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { SignUpUserDto } from './dtos/signup.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { TokenPayload } from './dtos/signin.dto';
+import { SignInUserDto } from './dtos/signin.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -60,13 +62,15 @@ export class AuthService {
     return user;
   }
 
-  getJwtToken(userId: number) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return token;
-  }
+  async validateUser(user: SignInUserDto) {
+    const [foundUser] = await this.usersService.find(user.email);
+    const [salt, storedHash] = user.password.split('.');
+    const hash = (await scrypt(user.password, salt, 32)) as Buffer;
 
-  getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+    if (storedHash !== hash.toString('hex')) {
+      throw new UnauthorizedException('Invalid login or password');
+    }
+    const { password: _password, ...retUser } = foundUser;
+    return retUser;
   }
 }

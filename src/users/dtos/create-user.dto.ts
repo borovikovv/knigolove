@@ -14,5 +14,5 @@ export class CreateUserDto {
   last_name: string;
 
   @IsNumber()
-  role: number;
+  role: string;
 }
