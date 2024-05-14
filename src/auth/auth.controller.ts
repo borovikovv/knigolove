@@ -14,11 +14,15 @@ import { Serialize } from 'src/interceptops';
 import { RequestWithUser, SignInUserDto } from './dtos/signin.dto';
 import { UserDto } from 'src/users/dtos/user.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @Controller('auth')
 @Serialize(UserDto)
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private redisService: RedisService,
+  ) {}
 
   @Post('/signup')
   async signup(
@@ -48,9 +52,14 @@ export class AuthController {
     };
   }
 
-  @Get('/who')
-  async whoIAm(@Req() request: RequestWithUser) {
-    const user = request.user;
+  @Get('/set')
+  async setRedis(@Req() request: RequestWithUser) {
+    this.redisService.set('user', 'Alex', 1000000);
+  }
+
+  @Get('/get')
+  async getRedis(@Req() request: RequestWithUser) {
+    const user = await this.redisService.get('user');
     return user;
   }
 

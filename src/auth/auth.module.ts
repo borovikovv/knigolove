@@ -6,10 +6,12 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { RedisModule } from 'src/redis';
 
 @Module({
   imports: [
     UsersModule,
+    RedisModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

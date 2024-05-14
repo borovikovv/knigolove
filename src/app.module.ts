@@ -11,6 +11,7 @@ import { Book } from './books/book.entity';
 import { FilesModule } from './files/files.module';
 import { PublicFile } from './files/files.entity';
 import { AuthModule } from './auth/auth.module';
+import { RedisModule } from './redis';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     FilesModule,
     AuthModule,
+    RedisModule,
   ],
 })
 export class AppModule {}
