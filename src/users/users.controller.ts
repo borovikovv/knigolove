@@ -34,7 +34,7 @@ export class UsersController {
 
   @Get()
   finAll(@Query('email') email: string) {
-    return this.userService.find(email);
+    return this.userService.findByEmail(email);
   }
 
   @Delete('/:id')

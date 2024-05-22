@@ -2,7 +2,8 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
-  UnauthorizedException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { UsersService } from '../users/users.service';
@@ -11,7 +12,7 @@ import { promisify } from 'util';
 import { SignUpUserDto } from './dtos/signup.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { SignInUserDto } from './dtos/signin.dto';
+import { TokenPayload } from './dtos/signin.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -25,7 +26,7 @@ export class AuthService {
 
   async signup(userData: SignUpUserDto) {
     const { email, password, first_name, last_name, role } = userData;
-    const users = await this.usersService.find(email);
+    const users = await this.usersService.findByEmail(email);
     if (users.length) {
       throw new BadRequestException('This email already use');
     }
@@ -46,7 +47,7 @@ export class AuthService {
   }
 
   async signin(email: string, password: string) {
-    const [user] = await this.usersService.find(email);
+    const [user] = await this.usersService.findByEmail(email);
 
     if (!user) {
       throw new NotFoundException('Invalid login or password');
@@ -62,27 +63,28 @@ export class AuthService {
     return user;
   }
 
-  async validateUser(user: SignInUserDto) {
-    const [foundUser] = await this.usersService.find(user.email);
-    const [salt, storedHash] = user.password.split('.');
-    const hash = (await scrypt(user.password, salt, 32)) as Buffer;
+  async getAuthenticatedUser(email: string, plainTextPassword: string) {
+    try {
+      const [user] = await this.usersService.findByEmail(email);
+      const [salt, storedHash] = user.password.split('.');
+      const hash = (await scrypt(plainTextPassword, salt, 32)) as Buffer;
 
-    if (storedHash !== hash.toString('hex')) {
-      throw new UnauthorizedException('Invalid login or password');
+      if (storedHash !== hash.toString('hex')) {
+        throw new BadRequestException('Invalid login or password');
+      }
+
+      return user;
+    } catch (error) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    const { password: _password, ...retUser } = foundUser;
-    return retUser;
   }
 
-  getPublicMessage(): string {
-    return 'This message is public to all!';
-  }
-
-  getPrivateMessage(): string {
-    return 'You can only see this if you are authenticated';
-  }
-
-  getAdminMessage(): string {
-    return 'You can only see this if you are an admin';
+  getJwtToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 }
