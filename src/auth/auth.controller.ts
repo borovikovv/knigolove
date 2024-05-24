@@ -43,10 +43,10 @@ export class AuthController {
     @Body() { email, password }: SignInUserDto,
   ) {
     const user = await this.authService.signin(email, password);
-    const toket = await this.authService.getJwtToken(user.id);
+    const token = await this.authService.getJwtToken(user.id);
     return {
       ...user,
-      toket,
+      token,
     };
   }
 
