@@ -7,6 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Book } from 'src/books/book.entity';
 import { PublicFile } from 'src/files/files.entity';
 
@@ -29,6 +30,12 @@ export class User {
 
   @Column()
   role: string;
+
+  @Column({
+    nullable: true,
+  })
+  @Exclude()
+  public refrestToken?: string;
 
   @JoinColumn()
   @OneToOne(() => PublicFile, {

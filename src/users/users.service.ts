@@ -1,13 +1,18 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { promisify } from 'util';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { FilesService } from 'src/files/files.service';
+
+const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class UsersService {
@@ -83,5 +88,31 @@ export class UsersService {
       avatar,
     });
     return avatar;
+  }
+
+  async setCurrentRefreshToken(refToken: string, userId: number) {
+    const salt = randomBytes(8).toString('hex');
+    const hash = (await scrypt(refToken, salt, 32)) as Buffer;
+    const refrestToken = `${salt}.${hash.toString('hex')}`;
+    await this.repo.update(userId, {
+      refrestToken,
+    });
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.getById(userId);
+
+    if (!user) {
+      throw new NotFoundException('Invalid login or password');
+    }
+
+    const [salt, storedHash] = user.refrestToken.split('.');
+    const hash = (await scrypt(refreshToken, salt, 32)) as Buffer;
+
+    if (storedHash !== hash.toString('hex')) {
+      throw new BadRequestException('Invalid session');
+    }
+
+    return user;
   }
 }

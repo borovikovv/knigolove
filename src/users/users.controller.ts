@@ -50,12 +50,13 @@ export class UsersController {
       throw new NotFoundException('not found user');
     }
     user.password = undefined;
+    user.refrestToken = undefined;
     return user;
   }
 
   @Get('/:id')
-  async findUser(@Param('id') id: string) {
-    const user = await this.userService.findOne(parseInt(id));
+  async findUser(@Param('id') id: number) {
+    const user = await this.userService.findOne(id);
     if (!user) {
       throw new NotFoundException('not found user');
     }

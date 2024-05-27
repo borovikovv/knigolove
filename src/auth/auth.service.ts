@@ -82,9 +82,29 @@ export class AuthService {
     }
   }
 
+  async removeRefreshToken(userId: number) {
+    return this.usersService.update(userId, {
+      refrestToken: null,
+    });
+  }
+
   getJwtToken(userId: number) {
     const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: Number(this.configService.get('JWT_EXPIRATION_TIME')),
+    });
+    return token;
+  }
+
+  public getJwtRefreshToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      expiresIn: Number(
+        this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+      ),
+    });
     return token;
   }
 }

@@ -6,6 +6,7 @@ import {
   Res,
   UseGuards,
   HttpCode,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
@@ -14,6 +15,7 @@ import { RequestWithUser, SignInUserDto } from './dtos/signin.dto';
 import { UserDto } from 'src/users/dtos/user.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { LocalAuthenticationGuard } from 'src/guards/local.guard';
+import JwtRefreshGuard from 'src/guards/jwt-refresh.guard';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -43,15 +45,26 @@ export class AuthController {
     @Body() { email, password }: SignInUserDto,
   ) {
     const user = await this.authService.signin(email, password);
-    const token = await this.authService.getJwtToken(user.id);
+    const token = this.authService.getJwtToken(user.id);
+    const refreshToken = this.authService.getJwtRefreshToken(user.id);
     return {
       ...user,
       token,
+      refreshToken,
     };
   }
 
   @Post('/signout')
   async signOut(@Req() request: RequestWithUser, @Res() response: Response) {
+    this.authService.removeRefreshToken(request.user.id);
     return response.sendStatus(200);
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  refresh(@Req() request: RequestWithUser) {
+    const token = this.authService.getJwtRefreshToken(request.user.id);
+
+    return token;
   }
 }
