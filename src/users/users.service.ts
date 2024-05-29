@@ -102,16 +102,16 @@ export class UsersService {
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
     const user = await this.getById(userId);
 
-    if (!user) {
-      throw new NotFoundException('Invalid login or password');
-    }
+    // if (!user) {
+    //   throw new NotFoundException('Invalid login or password');
+    // }
 
-    const [salt, storedHash] = user.refrestToken.split('.');
-    const hash = (await scrypt(refreshToken, salt, 32)) as Buffer;
+    // const [salt, storedHash] = user.refrestToken.split('.');
+    // const hash = (await scrypt(refreshToken, salt, 32)) as Buffer;
 
-    if (storedHash !== hash.toString('hex')) {
-      throw new BadRequestException('Invalid session');
-    }
+    // if (storedHash !== hash.toString('hex')) {
+    //   throw new BadRequestException('Invalid session');
+    // }
 
     return user;
   }
